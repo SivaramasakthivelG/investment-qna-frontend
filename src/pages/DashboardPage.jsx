@@ -34,8 +34,6 @@ const DashboardPage = () => {
         <TopNav title="" />
 
         <h1 className="dashboard-title">Welcome 👋</h1>
-        <h4 style={{color: "red"}}>VERSION 2</h4>
-
         <p className="dashboard-subtitle">
           Start a new stock analysis or review your research
         </p>
