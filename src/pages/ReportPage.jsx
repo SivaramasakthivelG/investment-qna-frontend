@@ -54,141 +54,138 @@ const ReportPage = () => {
     };
     fetchReports();
   }, []);
-
   const downloadPDF = (stock = null) => {
-    const pdf = new jsPDF("p", "mm", "a4");
-    let y = 20;
+  const pdf = new jsPDF("p", "mm", "a4");
 
-    pdf.setFontSize(20);
-    pdf.setTextColor(28, 37, 65);
-    pdf.text("Investment Research Report", 105, y, { align: "center" });
-    y += 15;
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
 
-    const data = stock ? [stock] : reports;
+  const margin = 15;
+  const maxWidth = pageWidth - margin * 2;
 
-    data.forEach((s) => {
-      const { overview, metrics, conclusion } = categorizeAnswers(s);
+  let y = 20;
 
-      pdf.setFontSize(16);
-      pdf.setTextColor(0, 128, 128);
-      pdf.text(`Stock: ${s.stockSymbol}`, 10, y);
-      y += 10;
-
-      const sections = [
-        { title: "Overview", content: overview },
-        { title: "Metrics", content: metrics },
-        { title: "Conclusion", content: conclusion },
-      ];
-
-      sections.forEach((sec) => {
-        pdf.setFontSize(14);
-        pdf.setTextColor(0, 102, 204);
-        pdf.text(sec.title, 12, y);
-        y += 7;
-
-        sec.content.forEach((txt) => {
-          pdf.setFontSize(12);
-          pdf.setTextColor(0, 0, 0);
-          pdf.text(txt, 14, y);
-          y += 6;
-
-          if (y > 280) {
-            pdf.addPage();
-            y = 20;
-          }
-        });
-
-        y += 5;
-      });
-
-      y += 8;
-      pdf.setDrawColor(200);
-      pdf.setLineWidth(0.5);
-      pdf.line(10, y, 200, y);
-      y += 10;
-
-      if (y > 280) {
-        pdf.addPage();
-        y = 20;
-      }
-    });
-
-    const fileName = stock ? `${stock.stockSymbol}_Report.pdf` : "Full_Investment_Report.pdf";
-    pdf.save(fileName);
-  };
-
-  const handleDelete = async (stockSymbol) => {
-    if (!window.confirm(`Are you sure you want to delete the report for ${stockSymbol}?`)) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`${API_BASE_URL}/api/reports/${stockSymbol}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setReports((prev) => prev.filter((r) => r.stockSymbol !== stockSymbol));
-      toast.success(`🗑️ ${stockSymbol} deleted successfully`);
-    } catch (err) {
-      console.error(err);
-      toast.error("❌ Failed to delete report");
+  // 🔹 Helper: add page safely
+  const checkPageBreak = (spaceNeeded = 10) => {
+    if (y + spaceNeeded > pageHeight - 10) {
+      pdf.addPage();
+      y = 20;
     }
   };
 
-  if (loading) {
-    return (
-      <div className="report-loading">
-        <div className="spinner-border text-accent" />
-        <p className="mt-3">Loading your investment reports…</p>
-      </div>
-    );
-  }
+  // 🔹 Helper: add section title
+  const addTitle = (text) => {
+    checkPageBreak(10);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(14);
+    pdf.setTextColor(0, 102, 204);
+    pdf.text(text, margin, y);
+    y += 8;
+  };
 
-  if (!reports.length) {
-    return (
-      <div className="report-loading">
-        <p>No reports available yet.</p>
-      </div>
-    );
-  }
+  // 🔹 Helper: add paragraph (core fix)
+  const addParagraph = (text) => {
+    if (!text) return;
 
-  return (
-    <div className="report-page">
-      <TopNav title="Investment Reports" />
+    const cleanText = text.replace(/\n/g, " ");
 
-      <div className="container">
-        {reports.map((stock) => {
-          const { overview, metrics, conclusion } = categorizeAnswers(stock);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(11);
+    pdf.setTextColor(0, 0, 0);
 
-          return (
-            <div key={stock.stockSymbol} className="report-card">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h2 className="stock-title">{stock.stockSymbol}</h2>
-                <div className="d-flex gap-2">
-                  <button className="btn-download-small" onClick={() => downloadPDF(stock)}>Download</button>
-                  <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(stock.stockSymbol)}>Delete</button>
-                </div>
-              </div>
+    const lines = pdf.splitTextToSize(cleanText, maxWidth);
 
-              <div className="report-grid">
-                <div className="report-box overview">
-                  <h4>Overview</h4>
-                  {overview.map((ans, idx) => <p key={idx}>{ans}</p>)}
-                </div>
-                <div className="report-box metrics">
-                  <h4>Metrics</h4>
-                  {metrics.map((ans, idx) => <p key={idx}>{ans}</p>)}
-                </div>
-                <div className="report-box conclusion">
-                  <h4>Conclusion</h4>
-                  {conclusion.map((ans, idx) => <p key={idx}>{ans}</p>)}
-                </div>
-              </div>
+    lines.forEach((line) => {
+      checkPageBreak(6);
+      pdf.text(line, margin, y);
+      y += 6;
+    });
+
+    y += 2; // spacing between paragraphs
+  };
+
+  // 🔹 Header
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(20);
+  pdf.setTextColor(28, 37, 65);
+  pdf.text("Investment Research Report", pageWidth / 2, y, {
+    align: "center",
+  });
+  y += 15;
+
+  const data = stock ? [stock] : reports;
+
+  data.forEach((s, index) => {
+    const { overview, metrics, conclusion } = categorizeAnswers(s);
+
+    // 🔹 Stock title
+    checkPageBreak(12);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(16);
+    pdf.setTextColor(0, 128, 128);
+    pdf.text(`Stock: ${s.stockSymbol}`, margin, y);
+    y += 10;
+
+    // 🔹 Sections
+    addTitle("Overview");
+    overview.forEach(addParagraph);
+
+    addTitle("Metrics");
+    metrics.forEach(addParagraph);
+
+    addTitle("Conclusion");
+    conclusion.forEach(addParagraph);
+
+    // 🔹 Divider
+    if (index !== data.length - 1) {
+      checkPageBreak(10);
+      pdf.setDrawColor(200);
+      pdf.setLineWidth(0.5);
+      pdf.line(margin, y, pageWidth - margin, y);
+      y += 10;
+    }
+  });
+
+  const fileName = stock
+    ? `${stock.stockSymbol}_Report.pdf`
+    : "Full_Investment_Report.pdf";
+
+  pdf.save(fileName);
+};
+return (
+  <div className="report-page">
+    <TopNav title="Investment Reports" />
+
+    <div className="container">
+      {reports.map((stock) => {
+        const { overview, metrics, conclusion } = categorizeAnswers(stock);
+
+        return (
+          <div key={stock.stockSymbol} className="report-card">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h2>{stock.stockSymbol}</h2>
+
+              <button onClick={() => downloadPDF(stock)}>
+                Download
+              </button>
             </div>
-          );
-        })}
-      </div>
+
+            <div>
+              <h4>Overview</h4>
+              {overview.map((ans, i) => <p key={i}>{ans}</p>)}
+
+              <h4>Metrics</h4>
+              {metrics.map((ans, i) => <p key={i}>{ans}</p>)}
+
+              <h4>Conclusion</h4>
+              {conclusion.map((ans, i) => <p key={i}>{ans}</p>)}
+            </div>
+          </div>
+        );
+      })}
     </div>
-  );
+  </div>
+);
 };
 
 export default ReportPage;
