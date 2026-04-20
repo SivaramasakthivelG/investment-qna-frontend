@@ -12,6 +12,6 @@ The product is evolving, with a focus on adding features that genuinely improve 
 ## Images of my application
 <img width="1272" height="635" alt="Screenshot 2026-04-20 at 10 10 17 PM" src="https://github.com/user-attachments/assets/144967ca-d616-4d67-a5b5-9705cbc3ded5" />
 
-
+<br/><br/>
 
 <img width="1272" height="635" alt="Screenshot 2026-04-20 at 10 10 41 PM" src="https://github.com/user-attachments/assets/d7f4c761-18ef-48bb-af7a-93ff6d6a4917" />
