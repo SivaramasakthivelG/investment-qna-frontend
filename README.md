@@ -1,16 +1,15 @@
-# React + Vite
+## 📊 Investment Process Enhancement App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This app is built to improve how individual investors approach stock research.
 
-Currently, two official plugins are available:
+You can pick stocks from the NSE and create a structured, single-page report by answering a set of guided questions. The goal is simple — turn scattered thoughts into a clear, repeatable investing process.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Each report helps you think through a company step by step, and you can save it for your own reference or share it with others.
 
-## React Compiler
+The product is evolving, with a focus on adding features that genuinely improve decision-making for retail investors. Open to contributors who are interested in investing and want to build something useful together.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Expanding the ESLint configuration
+## Images of my application
+<img width="1272" height="635" alt="Screenshot 2026-04-20 at 10 10 17 PM" src="https://github.com/user-attachments/assets/144967ca-d616-4d67-a5b5-9705cbc3ded5" />
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+<img width="1272" height="635" alt="Screenshot 2026-04-20 at 10 10 41 PM" src="https://github.com/user-attachments/assets/d7f4c761-18ef-48bb-af7a-93ff6d6a4917" />
